@@ -1,10 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.Rendering;
 
 namespace MMARGame.Controller
 {
+    [RequireComponent(typeof(CharacterController),typeof(PlayerInput))]
     public class PlayerController : MonoBehaviour
     {
         public float moveSpeed = 3;
@@ -17,10 +19,17 @@ namespace MMARGame.Controller
         Vector3 spherePos;
         [SerializeField] float gravity = -9.81f;
         Vector3 velocity;
+        private PlayerInput playerInput;
+        private InputAction moveAction;
         // Start is called before the first frame update
         void Start()
         {
             controller = GetComponent<CharacterController>();
+            playerInput = GetComponent<PlayerInput>();
+            if (playerInput != null)
+            {
+                moveAction = playerInput.actions["Move"];
+            }
         }
 
         // Update is called once per frame
@@ -36,9 +45,17 @@ namespace MMARGame.Controller
         }
         void GetDirectionAndMove()
         {
-            hzInput = Input.GetAxis("Horizontal");
-            vInput = Input.GetAxis("Vertical");
-
+            if (moveAction != null)
+            {
+                Vector2 input = moveAction.ReadValue<Vector2>();
+                hzInput = input.x;
+                vInput = input.y;
+            }
+            else
+            {
+                hzInput = 0;
+                vInput = 0;
+            }
             dir = transform.forward * vInput + transform.right * hzInput;
             controller.Move(dir.normalized * moveSpeed * Time.deltaTime);
         }
