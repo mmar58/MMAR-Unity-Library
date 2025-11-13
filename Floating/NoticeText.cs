@@ -10,6 +10,11 @@ namespace MMAR.Floating
         public float showingDuration = 2;
         public bool setThisOneAsInstance = true;
         public bool autoHide = true;
+        [Header("Default Color")]
+        public Color infoColor = Color.black;
+        public Color warningColor = Color.yellow;
+        public Color errorColor = Color.red;
+
         public static NoticeText instance;
 
         private void Awake()
@@ -28,15 +33,38 @@ namespace MMAR.Floating
         public void ShowNotice(string notice, string color = "#000000")
         {
             //Debug.Log("[NoticeText] ShowNotice: " + notice);
-            textField.text = notice;
+            
             if (ColorUtility.TryParseHtmlString(color, out Color parsedColor))
             {
-                textField.color = parsedColor;
+                ShowNotice(notice, parsedColor);
             }
             else
             {
-                textField.color = Color.black;
+                ShowNotice(notice, Color.black);
             }
+        }
+        public void ShowNotice(string notice, NoticeType type)
+        {
+            switch(type)
+            {
+                case NoticeType.Info:
+                    ShowNotice(notice, infoColor);
+                    break;
+                case NoticeType.Warning:
+                    ShowNotice(notice, warningColor);
+                    break;
+                case NoticeType.Error:
+                    ShowNotice(notice, errorColor);
+                    break;
+                default:
+                    ShowNotice(notice, infoColor);
+                    break;
+            }
+        }
+        public void ShowNotice(string notice,Color color)
+        {
+            textField.text = notice;
+            textField.color = color;
             lastShown = Time.time;
             ShowGameObject();
         }
@@ -72,4 +100,11 @@ namespace MMAR.Floating
         }
     }
 
+}
+
+public enum NoticeType
+{
+    Info,
+    Warning,
+    Error
 }
